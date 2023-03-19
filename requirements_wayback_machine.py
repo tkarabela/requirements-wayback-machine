@@ -54,7 +54,7 @@ from dataclasses import dataclass
 from datetime import date
 import traceback
 import re
-from typing import TypedDict, Any
+from typing import TypedDict, Any, Optional
 from packaging.requirements import Requirement
 import packaging.version
 import os.path as op
@@ -71,7 +71,7 @@ class ProjectReleaseDict(TypedDict):
     upload_time: str
     upload_time_iso_8681: str
     yanked: bool
-    requires_python: str | None
+    requires_python: Optional[str]
 
 
 class ProjectMetadataDict(TypedDict):
@@ -203,7 +203,7 @@ def main(argv: list[str]) -> int:
     args = parser.parse_args(argv)
     requirements_file_path: str = args.requirements_file_path
     reference_date: date = args.reference_date
-    output_path: str | None = args.output_path
+    output_path: Optional[str] = args.output_path
 
     try:
         new_requirements_file = process_requirements_file(requirements_file_path, reference_date)
