@@ -3,3 +3,5 @@
 /venv
 .mypy_cache/
 .pytest_cache/
+/dist
+*.egg-info/

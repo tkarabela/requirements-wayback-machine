@@ -61,7 +61,7 @@ import os.path as op
 import requests
 
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 
 class ProjectReleaseDict(TypedDict):
@@ -177,7 +177,10 @@ def process_requirements_file(requirements_file_path: str, reference_date: date)
     return "\n".join(output_lines)
 
 
-def main(argv: list[str]) -> int:
+def main(argv: Optional[list[str]] = None) -> int:
+    if argv is None:
+        argv = sys.argv[1:]
+
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument(
         "-r", "--requirement",
@@ -221,4 +224,4 @@ def main(argv: list[str]) -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv[1:]))
+    sys.exit(main())
