@@ -61,6 +61,9 @@ import os.path as op
 import requests
 
 
+__version__ = "0.1.0"
+
+
 class ProjectReleaseDict(TypedDict):
     """
     Entry in the `releases` dict in `ProjectMetadataDict`
@@ -177,27 +180,39 @@ def process_requirements_file(requirements_file_path: str, reference_date: date)
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument(
-        "-r",
+        "-r", "--requirement",
         dest="requirements_file_path",
         required=True,
         metavar='requirements.txt',
         help="path to requirements.txt file"
     )
     parser.add_argument(
-        "-d",
+        "-d", "--date",
         dest="reference_date",
         type=date.fromisoformat,
         default=date.today(),
         metavar='YYYY-MM-DD',
         help="reference date (default: today)"
     )
+    parser.add_argument(
+        "-o", "--output",
+        dest="output_path",
+        metavar='requirements-annotated.txt',
+        help="write annotated output to file (default: print to stdout)"
+    )
     args = parser.parse_args(argv)
     requirements_file_path: str = args.requirements_file_path
     reference_date: date = args.reference_date
+    output_path: str | None = args.output_path
 
     try:
         new_requirements_file = process_requirements_file(requirements_file_path, reference_date)
-        print(new_requirements_file)
+
+        if output_path is None:
+            print(new_requirements_file)
+        else:
+            with open(output_path, "w", encoding="utf-8") as fp:
+                print(new_requirements_file, file=fp)
     except Exception:
         traceback.print_exc()
         return 1
