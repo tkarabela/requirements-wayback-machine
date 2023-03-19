@@ -124,3 +124,38 @@ def test_requirements_complex() -> None:
             output = fp.read()
 
         assert output.strip() == REQUIREMENTS_COMPLEX_ANNOTATED.strip()
+
+
+REQUIREMENTS_IMPOSSIBLE = """\
+requests>=2.26,<3.0
+
+  # comment after empty line
+"""
+
+REQUIREMENTS_IMPOSSIBLE_ANNOTATED = """\
+# requirements_wayback_machine: reference date 1970-01-01
+# requirements_wayback_machine: warning - no matching version found for requests<3.0,>=2.26
+requests>=2.26,<3.0
+
+  # comment after empty line
+"""
+
+def test_requirements_impossible() -> None:
+    # note: this test depends on live PyPI JSON API!
+    with tempfile.TemporaryDirectory() as temp_dir:
+        input_path = op.join(temp_dir, "requirements.txt")
+        output_path = op.join(temp_dir, "requirements-annotated.txt")
+
+        with open(input_path, "w") as fp:
+            fp.write(REQUIREMENTS_IMPOSSIBLE)
+
+        assert requirements_wayback_machine.main([
+            "-r", input_path,
+            "-d", "1970-01-01",
+            "-o", output_path
+        ]) == 0
+
+        with open(output_path) as fp:
+            output = fp.read()
+
+        assert output.strip() == REQUIREMENTS_IMPOSSIBLE_ANNOTATED.strip()
