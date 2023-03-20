@@ -1,29 +1,20 @@
 [![CI - build](https://img.shields.io/github/actions/workflow/status/tkarabela/requirements-wayback-machine/main.yml?branch=master)](https://github.com/tkarabela/requirements-wayback-machine/actions)
 [![CI - coverage](https://img.shields.io/codecov/c/github/tkarabela/requirements-wayback-machine)](https://app.codecov.io/github/tkarabela/requirements-wayback-machine)
-![MyPy checked](http://www.mypy-lang.org/static/mypy_badge.svg)
-![PyPI - Version](https://img.shields.io/pypi/v/requirements-wayback-machine.svg?style=flat-square)
-![PyPI - Status](https://img.shields.io/pypi/status/requirements-wayback-machine.svg?style=flat-square)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/requirements-wayback-machine.svg?style=flat-square)
+[![MyPy checked](http://www.mypy-lang.org/static/mypy_badge.svg)](https://github.com/tkarabela/requirements-wayback-machine/actions)
+[![PyPI - Version](https://img.shields.io/pypi/v/requirements-wayback-machine.svg?style=flat-square)](https://pypi.org/project/requirements-wayback-machine/)
+[![PyPI - Status](https://img.shields.io/pypi/status/requirements-wayback-machine.svg?style=flat-square)](https://pypi.org/project/requirements-wayback-machine/)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/requirements-wayback-machine.svg?style=flat-square)](https://pypi.org/project/requirements-wayback-machine/)
 ![License](https://img.shields.io/pypi/l/requirements-wayback-machine.svg?style=flat-square)
 
 # Requirements.txt Wayback Machine 🚂🕒️
 
-_Note: This is script is not developed nor endorsed by the
+_Note: This script is not developed nor endorsed by the
 [Python Packaging Authority (PyPA)](https://www.pypa.io/en/latest/)
 or other official Python body._
 
-If you're struggling to get correct Python dependencies for an older project,
-__requirements_wayback_machine__ is a script that gets you from this `requirements.txt`:
+```sh
+$ requirements_wayback_machine -r requirements.txt -d 2021-02-03
 
-```
-torch
-torchvision
-imageio
-```
-
-to this:
-
-```
 # requirements_wayback_machine: reference date 2021-02-03
 # requirements_wayback_machine: torch<=1.7.1
 torch
@@ -32,6 +23,28 @@ torchvision
 # requirements_wayback_machine: imageio<=2.9.0
 imageio
 ```
+
+Installing correct dependencies for an older Python project can be tricky, since
+`pip install -r requirements.txt` can easily __install a package version that is too recent and
+incompatible with the old project__. This can happen even if the `requirements.txt` file
+specifies an exact version (eg. `torch==1.7.1`), since __Python packages often only specify
+minimum versions of their dependencies__ (which does not prevent a new major dependency version
+to be installed).
+
+One solution to this problem is exact specification of all transitive dependencies as provided
+by `pip freeze` or Pipenv/Poetry lockfiles. __If you don't have a lockfile__, this is where
+Requirements.txt Wayback Machine comes in to tell you __what was the last available version
+of each dependency__ by given date. Presumably __at some time in the past,
+`pip install` grabbed the correct versions__, so giving an approximate date when the project
+was working will help you pin the correct versions.
+
+Tip: If you're still having trouble after adding constraints for maximum versions for all
+entries in your `requirements.txt`, try listing all transitive dependencies with `pip freeze`
+and running Requirements.txt Wayback Machine again on this larger `requirements.txt`
+(a suggestion by u/hai_wim on Reddit). Note that you will need to remove the `==` exact
+constraints that `pip freeze` adds before doing this (the Wayback Machine is trying to satisfy the existing constraints,
+so using `==` doesn't really make sense, it would find no suitable version if the `==` version
+is too new).
 
 ## Installation
 
@@ -44,20 +57,17 @@ $ pip install requirements-wayback-machine
 ```sh
 $ requirements_wayback_machine -r <path_to_requirements.txt> -d <YYYY-MM-DD>
 ```
-
-This will print annotated `requirements.txt` to console, including upper bound
-specifiers that approximate dependency resolution at given date
-(for each requirement line, we print the last version of that dependency
-released by given date that also satisfies specifiers already present
-in the input requirement line, if any).
-
 For more information and options, run `requirements_wayback_machine -h`.
 
 Example:
 
 ```sh
-$ requirements_wayback_machine -r requirements.txt -d 2021-02-03
+$ cat requirements.txt
+torch
+torchvision
+imageio
 
+$ requirements_wayback_machine -r requirements.txt -d 2021-02-03
 # requirements_wayback_machine: reference date 2021-02-03
 # requirements_wayback_machine: torch<=1.7.1
 torch
